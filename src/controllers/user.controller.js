@@ -34,3 +34,21 @@ export const register = async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 }
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    // BUG: olvidé el select('+password'), siempre falla
+    const user = await User.findOne({ email })
+    if (!user) return res.status(401).json({ error: 'credenciales incorrectas' })
+
+    const ok = await bcrypt.compare(password, user.password)
+    if (!ok) return res.status(401).json({ error: 'credenciales incorrectas' })
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' })
+    res.json({ token })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
