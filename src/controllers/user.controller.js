@@ -66,3 +66,15 @@ export const login = async (req, res, next) => {
     res.json({ user: { email: user.email, status: user.status, role: user.role }, accessToken, refreshToken })
   } catch (err) { next(err) }
 }
+
+export const updatePersonalData = async (req, res, next) => {
+  try {
+    const { name, lastName, nif } = req.body
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, lastName, nif },
+      { new: true }
+    ).populate('company')
+    res.json({ user })
+  } catch (err) { next(err) }
+}
