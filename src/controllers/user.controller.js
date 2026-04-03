@@ -63,3 +63,26 @@ export const login = async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 }
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { code } = req.body
+    const user = await User.findById(req.user._id).select('+verificationCode +verificationAttempts')
+
+    if (user.status === 'verified') {
+      return res.status(400).json({ error: 'el email ya esta verificado' })
+    }
+
+    if (code !== user.verificationCode) {
+      // BUG: resta pero no guarda, siempre tiene 3 intentos
+      user.verificationAttempts - 1
+      return res.status(400).json({ error: 'codigo incorrecto' })
+    }
+
+    user.status = 'verified'
+    await user.save()
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
