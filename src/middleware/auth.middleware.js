@@ -1,16 +1,26 @@
 import jwt from 'jsonwebtoken'
 import { config } from '../config/index.js'
 import { User } from '../models/User.js'
+import { AppError } from '../utils/AppError.js'
 
-// BUG: si no viene Authorization header, explota con TypeError
 export const protect = async (req, res, next) => {
-  const token = req.headers.authorization.split(' ')[1]
-
   try {
-    const payload = jwt.verify(token, config.jwt.secret)
-    req.user = await User.findById(payload.id)
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) {
+      return next(AppError.unauthorized('Token no proporcionado'))
+    }
+    const token = authHeader.split(' ')[1]
+    let payload
+    try {
+      payload = jwt.verify(token, config.jwt.secret)
+    } catch {
+      return next(AppError.unauthorized('Token inválido o expirado'))
+    }
+    const user = await User.findById(payload.id)
+    if (!user) return next(AppError.unauthorized('Usuario no encontrado'))
+    req.user = user
     next()
   } catch (err) {
-    res.status(401).json({ error: 'token inválido' })
+    next(err)
   }
 }
