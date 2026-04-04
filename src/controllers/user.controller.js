@@ -78,3 +78,30 @@ export const updatePersonalData = async (req, res, next) => {
     res.json({ user })
   } catch (err) { next(err) }
 }
+
+export const updateCompany = async (req, res, next) => {
+  try {
+    const { cif, name, address } = req.body
+    const { Company } = await import('../models/Company.js')
+
+    const existente = await Company.findOne({ cif })
+    let company
+    let nuevoRol = 'admin'
+
+    if (!existente) {
+      company  = await Company.create({ owner: req.user._id, cif, name, address })
+    } else {
+      company  = existente
+      nuevoRol = 'guest'
+    }
+
+    // TODO: falta el caso isFreelance
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { company: company._id, role: nuevoRol },
+      { new: true }
+    ).populate('company')
+
+    res.json({ user })
+  } catch (err) { next(err) }
+}
