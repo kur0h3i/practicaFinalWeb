@@ -4,6 +4,7 @@ import { config } from '../config/index.js'
 import { User }    from '../models/User.js'
 import { Company } from '../models/Company.js'
 import { AppError } from '../utils/AppError.js'
+import { notifier } from '../services/notification.service.js'
 
 const generateCode = () => String(Math.floor(100000 + Math.random() * 900000))
 const signAccess  = (id) => jwt.sign({ id }, config.jwt.secret,       { expiresIn: config.jwt.expiresIn })
@@ -22,6 +23,7 @@ export const register = async (req, res, next) => {
     user.refreshToken = refreshToken
     await user.save()
     const devExtra = config.nodeEnv !== 'production' ? { _devCode: code } : {}
+    notifier.emit('user:registered', { id: user._id, email: user.email })
     res.status(201).json({ user: { email: user.email, status: user.status, role: user.role }, accessToken, refreshToken, ...devExtra })
   } catch (err) { next(err) }
 }
