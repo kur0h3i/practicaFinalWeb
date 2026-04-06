@@ -43,6 +43,7 @@ export const verifyEmail = async (req, res, next) => {
     user.status = 'verified'
     user.verificationCode = undefined
     await user.save()
+    notifier.emit('user:verified', { id: user._id, email: user.email })
     res.json({ ok: true })
   } catch (err) { next(err) }
 }
@@ -134,6 +135,7 @@ export const deleteUser = async (req, res, next) => {
     const soft = req.query.soft === 'true'
     if (soft) { await User.findByIdAndUpdate(req.user._id, { deleted: true }) }
     else       { await User.findByIdAndDelete(req.user._id) }
+    notifier.emit('user:deleted', { id: req.user._id, soft })
     res.json({ ok: true, mensaje: `Usuario eliminado (${soft ? 'soft' : 'hard'})` })
   } catch (err) { next(err) }
 }
@@ -159,6 +161,7 @@ export const inviteUser = async (req, res, next) => {
     const tempPass = await bcrypt.hash(Math.random().toString(36).slice(-10), 12)
     const code     = generateCode()
     const invited  = await User.create({ email, name, lastName, password: tempPass, verificationCode: code, verificationAttempts: 3, role: 'guest', status: 'pending', company: req.user.company })
+    notifier.emit('user:invited', { id: invited._id, email: invited.email, invitedBy: req.user.email })
     res.status(201).json({ ok: true, user: { email: invited.email, role: invited.role, company: invited.company } })
   } catch (err) { next(err) }
 }

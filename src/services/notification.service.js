@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 
 class NotificationService extends EventEmitter {}
 export const notifier = new NotificationService()

@@ -1,5 +1,5 @@
 import multer from 'multer'
-import path from 'path'
+import path from 'node:path'
 import { config } from '../config/index.js'
 import { AppError } from '../utils/AppError.js'
 
