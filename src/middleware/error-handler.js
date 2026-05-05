@@ -1,4 +1,5 @@
 import { AppError } from '../utils/AppError.js'
+import { notifySlack } from '../services/logger.service.js'
 
 export const errorHandler = (err, req, res, _next) => {
   if (err.code === 11000) {
@@ -21,6 +22,9 @@ export const errorHandler = (err, req, res, _next) => {
   const message = err.isOperational ? err.message : 'Error interno del servidor'
 
   if (!err.isOperational) console.error('[ERROR NO CONTROLADO]', err)
+
+  // Notify Slack for all 5XX errors
+  if (status >= 500) notifySlack(err, req)
 
   res.status(status).json({ ok: false, code, message })
 }
