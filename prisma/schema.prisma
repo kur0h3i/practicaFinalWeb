@@ -1,0 +1,199 @@
+// Prisma schema — BildyApp (versión PostgreSQL complementaria a MongoDB)
+// Proveedor recomendado: Supabase (https://supabase.com)
+//
+// Pasos para activar:
+//   1. Crea un proyecto en Supabase y copia la Connection String
+//   2. Añade DATABASE_URL en .env
+//   3. npm run prisma:generate
+//   4. npm run prisma:migrate
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum Role {
+  admin
+  guest
+}
+
+enum UserStatus {
+  pending
+  verified
+}
+
+enum NoteFormat {
+  material
+  hours
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+model PgUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  password     String
+  name         String?
+  lastName     String?
+  nif          String?
+  role         Role       @default(admin)
+  status       UserStatus @default(pending)
+
+  // Relación con compañía (muchos usuarios → una compañía)
+  companyId    String?
+  company      PgCompany? @relation("CompanyMembers", fields: [companyId], references: [id])
+
+  // Una compañía que este usuario posee
+  ownedCompany PgCompany? @relation("CompanyOwner")
+
+  clients      PgClient[]
+  projects     PgProject[]
+  deliveryNotes PgDeliveryNote[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("pg_users")
+}
+
+model PgCompany {
+  id          String     @id @default(cuid())
+  name        String
+  cif         String     @unique
+  isFreelance Boolean    @default(false)
+  logo        String?
+
+  // Owner: relación 1-a-1
+  ownerId     String     @unique
+  owner       PgUser     @relation("CompanyOwner", fields: [ownerId], references: [id])
+
+  // Miembros
+  members     PgUser[]   @relation("CompanyMembers")
+
+  clients      PgClient[]
+  projects     PgProject[]
+  deliveryNotes PgDeliveryNote[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("pg_companies")
+}
+
+model PgClient {
+  id        String    @id @default(cuid())
+  name      String
+  cif       String
+  email     String?
+  phone     String?
+  street    String?
+  number    String?
+  postal    String?
+  city      String?
+  province  String?
+  deleted   Boolean   @default(false)
+
+  userId    String
+  user      PgUser    @relation(fields: [userId], references: [id])
+
+  companyId String
+  company   PgCompany @relation(fields: [companyId], references: [id])
+
+  projects      PgProject[]
+  deliveryNotes PgDeliveryNote[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([companyId, cif])
+  @@map("pg_clients")
+}
+
+model PgProject {
+  id          String    @id @default(cuid())
+  name        String
+  projectCode String
+  email       String?
+  notes       String?
+  active      Boolean   @default(true)
+  deleted     Boolean   @default(false)
+  street      String?
+  number      String?
+  postal      String?
+  city        String?
+  province    String?
+
+  userId    String
+  user      PgUser    @relation(fields: [userId], references: [id])
+
+  companyId String
+  company   PgCompany @relation(fields: [companyId], references: [id])
+
+  clientId  String
+  client    PgClient  @relation(fields: [clientId], references: [id])
+
+  deliveryNotes PgDeliveryNote[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([companyId, projectCode])
+  @@map("pg_projects")
+}
+
+model PgWorker {
+  id             String         @id @default(cuid())
+  name           String
+  hours          Float
+  deliveryNoteId String
+  deliveryNote   PgDeliveryNote @relation(fields: [deliveryNoteId], references: [id], onDelete: Cascade)
+
+  @@map("pg_workers")
+}
+
+model PgDeliveryNote {
+  id          String     @id @default(cuid())
+  format      NoteFormat
+  description String?
+  workDate    DateTime
+
+  // Material fields
+  material    String?
+  quantity    Float?
+  unit        String?
+
+  // Hours fields
+  hours       Float?
+  workers     PgWorker[]
+
+  // Signature / PDF
+  signed       Boolean   @default(false)
+  signedAt     DateTime?
+  signatureUrl String?
+  pdfUrl       String?
+
+  deleted     Boolean    @default(false)
+
+  userId    String
+  user      PgUser    @relation(fields: [userId], references: [id])
+
+  companyId String
+  company   PgCompany @relation(fields: [companyId], references: [id])
+
+  clientId  String
+  client    PgClient  @relation(fields: [clientId], references: [id])
+
+  projectId String
+  project   PgProject @relation(fields: [projectId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("pg_delivery_notes")
+}
