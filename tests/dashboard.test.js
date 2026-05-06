@@ -11,13 +11,17 @@ beforeAll(async () => { await connect() })
 afterEach(async () => { await clearDatabase() })
 afterAll(async () => { await closeDatabase() })
 
+let emailCounter = 0
+const uniqueEmail = () => `dash-${++emailCounter}@test.com`
+
 const setupUserWithCompany = async () => {
+  const email = uniqueEmail()
   const regRes = await request(app)
     .post('/api/user/register')
-    .send({ email: 'dash@test.com', password: 'Password1!' })
+    .send({ email, password: 'Password1!' })
 
   const accessToken = regRes.body.accessToken
-  const user = await User.findOne({ email: 'dash@test.com' })
+  const user = await User.findOne({ email })
   const company = await Company.create({ owner: user._id, name: 'DashCo', cif: 'B12345678' })
   await User.findByIdAndUpdate(user._id, { company: company._id })
 
@@ -29,7 +33,7 @@ describe('Dashboard — sin compañía', () => {
   it('devuelve mensaje si el usuario no tiene compañía', async () => {
     const regRes = await request(app)
       .post('/api/user/register')
-      .send({ email: 'nocompany@test.com', password: 'Password1!' })
+      .send({ email: uniqueEmail(), password: 'Password1!' })
 
     const res = await request(app)
       .get('/api/dashboard')

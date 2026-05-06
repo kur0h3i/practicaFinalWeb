@@ -9,13 +9,17 @@ beforeAll(async () => { await connect() })
 afterEach(async () => { await clearDatabase() })
 afterAll(async () => { await closeDatabase() })
 
+let emailCounter = 0
+const uniqueEmail = () => `project-admin-${++emailCounter}@test.com`
+
 const setupUserWithClient = async () => {
+  const email = uniqueEmail()
   const regRes = await request(app)
     .post('/api/user/register')
-    .send({ email: 'admin@test.com', password: 'Password1!' })
+    .send({ email, password: 'Password1!' })
 
   const accessToken = regRes.body.accessToken
-  const user = await User.findOne({ email: 'admin@test.com' })
+  const user = await User.findOne({ email })
   const userId = user._id
 
   const company = await Company.create({ owner: userId, name: 'TestCo', cif: 'B00000001' })
