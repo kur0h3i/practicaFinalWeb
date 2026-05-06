@@ -2,8 +2,8 @@
 
 Backend completo para la digitalización de albaranes. API REST con Node.js y Express que gestiona clientes, proyectos y albaranes (horas o materiales), con firma digital, generación de PDF y notificaciones en tiempo real.
 
-**🚀 Producción:** https://practicafinalweb-production.up.railway.app  
-**📖 Swagger:** https://practicafinalweb-production.up.railway.app/api-docs
+**Producción:** https://practicafinalweb-production.up.railway.app  
+**Swagger:** https://practicafinalweb-production.up.railway.app/api-docs
 
 ---
 
@@ -288,21 +288,21 @@ prisma/
 
 ## Características implementadas
 
-- ✅ CRUD completo de clientes, proyectos y albaranes
-- ✅ Paginación y filtros en todos los listados
-- ✅ Soft-delete y restauración
-- ✅ Firma digital de albaranes con subida a Cloudinary
-- ✅ Optimización de imágenes con Sharp (WebP, 800px)
-- ✅ Generación de PDF con PDFKit y subida a Cloudinary
-- ✅ Swagger/OpenAPI 3.0 en `/api-docs`
-- ✅ 61 tests de integración con cobertura ≥70%
-- ✅ Socket.IO con rooms por compañía (JWT auth)
-- ✅ Docker multi-stage + docker-compose
-- ✅ GitHub Actions CI
-- ✅ Health check en `GET /health`
-- ✅ Graceful shutdown (SIGTERM/SIGINT)
-- ✅ Envío de emails con Nodemailer
-- ✅ Logging de errores 5XX a Slack
-- ✅ Rate limiting + Helmet + sanitización NoSQL
-- ✅ **Bonus:** Dashboard con aggregation pipeline (+0.5)
-- ✅ **Bonus:** PostgreSQL + Prisma + Supabase (+1)
+- CRUD completo de clientes, proyectos y albaranes
+- Paginación y filtros en todos los listados
+- Soft-delete y restauración
+- Firma digital de albaranes con subida a Cloudinary
+- Optimización de imágenes con Sharp (WebP, 800px)
+- Generación de PDF con PDFKit y subida a Cloudinary
+- Swagger/OpenAPI 3.0 en `/api-docs`
+- 61 tests de integración con cobertura ≥70%
+- Socket.IO con rooms por compañía (JWT auth)
+- Docker multi-stage + docker-compose
+- GitHub Actions CI
+- Health check en `GET /health`
+- Graceful shutdown (SIGTERM/SIGINT)
+- Envío de emails con Nodemailer
+- Logging de errores 5XX a Slack
+- Rate limiting + Helmet + sanitización NoSQL
+- **Bonus:** Dashboard con aggregation pipeline (+0.5)
+- **Bonus:** PostgreSQL + Prisma + Supabase (+1)
