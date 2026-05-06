@@ -9,7 +9,6 @@ const emitToCompany = (req, event, data) => {
   }
 }
 
-// POST /api/project
 export const createProject = async (req, res, next) => {
   try {
     if (!req.user.company) return next(AppError.badRequest('El usuario no tiene compañía asignada'))
@@ -27,7 +26,6 @@ export const createProject = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PUT /api/project/:id
 export const updateProject = async (req, res, next) => {
   try {
     const project = await Project.findOne({ _id: req.params.id, company: req.user.company })
@@ -50,7 +48,6 @@ export const updateProject = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/project
 export const listProjects = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, name, client, active, sort = '-createdAt' } = req.query
@@ -77,7 +74,6 @@ export const listProjects = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/project/archived
 export const listArchivedProjects = async (req, res, next) => {
   try {
     const projects = await Project.find({ company: req.user.company, deleted: true })
@@ -88,7 +84,6 @@ export const listArchivedProjects = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/project/:id
 export const getProject = async (req, res, next) => {
   try {
     const project = await Project.findOne({ _id: req.params.id, company: req.user.company })
@@ -98,7 +93,6 @@ export const getProject = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// DELETE /api/project/:id
 export const deleteProject = async (req, res, next) => {
   try {
     const soft    = req.query.soft !== 'false'
@@ -115,7 +109,6 @@ export const deleteProject = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PATCH /api/project/:id/restore
 export const restoreProject = async (req, res, next) => {
   try {
     const project = await Project.findOne({ _id: req.params.id, company: req.user.company, deleted: true })

@@ -8,7 +8,6 @@ const emitToCompany = (req, event, data) => {
   }
 }
 
-// POST /api/client
 export const createClient = async (req, res, next) => {
   try {
     if (!req.user.company) return next(AppError.badRequest('El usuario no tiene compañía asignada'))
@@ -23,7 +22,6 @@ export const createClient = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PUT /api/client/:id
 export const updateClient = async (req, res, next) => {
   try {
     const client = await Client.findOne({ _id: req.params.id, company: req.user.company })
@@ -41,7 +39,6 @@ export const updateClient = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/client
 export const listClients = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, name, sort = '-createdAt' } = req.query
@@ -65,7 +62,6 @@ export const listClients = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/client/archived
 export const listArchivedClients = async (req, res, next) => {
   try {
     const clients = await Client.find({ company: req.user.company, deleted: true })
@@ -75,7 +71,6 @@ export const listArchivedClients = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/client/:id
 export const getClient = async (req, res, next) => {
   try {
     const client = await Client.findOne({ _id: req.params.id, company: req.user.company })
@@ -84,7 +79,6 @@ export const getClient = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// DELETE /api/client/:id
 export const deleteClient = async (req, res, next) => {
   try {
     const soft   = req.query.soft !== 'false'
@@ -101,7 +95,6 @@ export const deleteClient = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PATCH /api/client/:id/restore
 export const restoreClient = async (req, res, next) => {
   try {
     const client = await Client.findOne({ _id: req.params.id, company: req.user.company, deleted: true })

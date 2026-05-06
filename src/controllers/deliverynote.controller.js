@@ -13,7 +13,6 @@ const emitToCompany = (req, event, data) => {
   }
 }
 
-// POST /api/deliverynote
 export const createDeliveryNote = async (req, res, next) => {
   try {
     if (!req.user.company) return next(AppError.badRequest('El usuario no tiene compañía asignada'))
@@ -35,7 +34,6 @@ export const createDeliveryNote = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/deliverynote
 export const listDeliveryNotes = async (req, res, next) => {
   try {
     const {
@@ -76,7 +74,6 @@ export const listDeliveryNotes = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/deliverynote/:id
 export const getDeliveryNote = async (req, res, next) => {
   try {
     const note = await DeliveryNote.findOne({ _id: req.params.id, company: req.user.company })
@@ -89,7 +86,6 @@ export const getDeliveryNote = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/deliverynote/pdf/:id
 export const downloadPdf = async (req, res, next) => {
   try {
     const note = await DeliveryNote.findOne({ _id: req.params.id, company: req.user.company })
@@ -99,7 +95,6 @@ export const downloadPdf = async (req, res, next) => {
       .populate('company', 'name cif address')
     if (!note) return next(AppError.notFound('Albarán no encontrado'))
 
-    // If signed and already has a cloud PDF, redirect to it
     if (note.signed && note.pdfUrl) {
       return res.redirect(note.pdfUrl)
     }
@@ -117,7 +112,6 @@ export const downloadPdf = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PATCH /api/deliverynote/:id/sign
 export const signDeliveryNote = async (req, res, next) => {
   try {
     if (!req.file) return next(AppError.badRequest('Se requiere imagen de firma'))
@@ -130,7 +124,6 @@ export const signDeliveryNote = async (req, res, next) => {
     if (!note) return next(AppError.notFound('Albarán no encontrado'))
     if (note.signed) return next(AppError.conflict('El albarán ya está firmado'))
 
-    // Optimize signature image with sharp
     const optimized = await sharp(req.file.buffer)
       .resize({ width: 800, withoutEnlargement: true })
       .webp({ quality: 80 })
@@ -138,7 +131,6 @@ export const signDeliveryNote = async (req, res, next) => {
 
     const signatureUrl = await uploadSignature(optimized)
 
-    // Generate PDF
     note.signed       = true
     note.signedAt     = new Date()
     note.signatureUrl = signatureUrl
@@ -160,7 +152,6 @@ export const signDeliveryNote = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// DELETE /api/deliverynote/:id
 export const deleteDeliveryNote = async (req, res, next) => {
   try {
     const note = await DeliveryNote.findOne({ _id: req.params.id, company: req.user.company })
