@@ -2,6 +2,9 @@
 
 Backend completo para la digitalización de albaranes. API REST con Node.js y Express que gestiona clientes, proyectos y albaranes (horas o materiales), con firma digital, generación de PDF y notificaciones en tiempo real.
 
+**🚀 Producción:** https://practicafinalweb-production.up.railway.app  
+**📖 Swagger:** https://practicafinalweb-production.up.railway.app/api-docs
+
 ---
 
 ## Tecnologías
