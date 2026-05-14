@@ -69,9 +69,9 @@
  *       200: { description: Proyecto encontrado }
  *       401: { description: No autorizado }
  *       404: { description: No encontrado }
- *   put:
+ *   patch:
  *     tags: [Projects]
- *     summary: Actualizar un proyecto
+ *     summary: Actualizar un proyecto (parcial)
  *     parameters:
  *       - { in: path, name: id, required: true, schema: { type: string } }
  *     responses:
@@ -121,7 +121,7 @@ router.get('/archived', listArchivedProjects)
 router.post('/',             validate(createProjectSchema), createProject)
 router.get('/',              listProjects)
 router.get('/:id',           getProject)
-router.put('/:id',           validate(updateProjectSchema), updateProject)
+router.patch('/:id',         validate(updateProjectSchema), updateProject)
 router.delete('/:id',        deleteProject)
 router.patch('/:id/restore', restoreProject)
 

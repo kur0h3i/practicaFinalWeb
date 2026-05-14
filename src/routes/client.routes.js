@@ -100,9 +100,9 @@
  *                 client: { $ref: '#/components/schemas/Client' }
  *       401: { description: No autorizado }
  *       404: { description: No encontrado }
- *   put:
+ *   patch:
  *     tags: [Clients]
- *     summary: Actualizar un cliente
+ *     summary: Actualizar un cliente (parcial)
  *     parameters:
  *       - in: path
  *         name: id
@@ -174,7 +174,7 @@ router.get('/archived', listArchivedClients)
 router.post('/',             validate(createClientSchema), createClient)
 router.get('/',              listClients)
 router.get('/:id',           getClient)
-router.put('/:id',           validate(updateClientSchema), updateClient)
+router.patch('/:id',         validate(updateClientSchema), updateClient)
 router.delete('/:id',        deleteClient)
 router.patch('/:id/restore', restoreClient)
 
