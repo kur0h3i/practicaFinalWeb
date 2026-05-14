@@ -95,7 +95,7 @@ export const getProject = async (req, res, next) => {
 
 export const deleteProject = async (req, res, next) => {
   try {
-    const soft    = req.query.soft !== 'false'
+    const soft    = req.query.soft === 'true'
     const project = await Project.findOne({ _id: req.params.id, company: req.user.company })
     if (!project) return next(AppError.notFound('Proyecto no encontrado'))
 

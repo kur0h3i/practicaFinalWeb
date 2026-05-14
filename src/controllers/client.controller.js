@@ -81,7 +81,7 @@ export const getClient = async (req, res, next) => {
 
 export const deleteClient = async (req, res, next) => {
   try {
-    const soft   = req.query.soft !== 'false'
+    const soft   = req.query.soft === 'true'
     const client = await Client.findOne({ _id: req.params.id, company: req.user.company })
     if (!client) return next(AppError.notFound('Cliente no encontrado'))
 
