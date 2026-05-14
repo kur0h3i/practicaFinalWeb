@@ -118,7 +118,7 @@ describe('Clients — GET /api/client', () => {
   })
 })
 
-describe('Clients — PUT /api/client/:id', () => {
+describe('Clients — PATCH /api/client/:id', () => {
   it('updates a client', async () => {
     const { accessToken } = await registerAndSetupUser()
 
@@ -128,12 +128,41 @@ describe('Clients — PUT /api/client/:id', () => {
       .send({ name: 'Client A', cif: 'B11111111' })
 
     const res = await request(app)
-      .put(`/api/client/${created.body.client._id}`)
+      .patch(`/api/client/${created.body.client._id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({ name: 'Client A Updated', phone: '600000000' })
 
     expect(res.status).toBe(200)
     expect(res.body.client.name).toBe('Client A Updated')
+  })
+
+  it('is idempotent: two identical PATCH calls produce the same state', async () => {
+    const { accessToken } = await registerAndSetupUser()
+
+    const created = await request(app)
+      .post('/api/client')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Client A', cif: 'B11111111', phone: '600000000' })
+
+    const id = created.body.client._id
+    const body = { name: 'Client Idempotente', phone: '611111111' }
+
+    const first = await request(app)
+      .patch(`/api/client/${id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send(body)
+
+    const second = await request(app)
+      .patch(`/api/client/${id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send(body)
+
+    expect(first.status).toBe(200)
+    expect(second.status).toBe(200)
+    expect(second.body.client.name).toBe(first.body.client.name)
+    expect(second.body.client.phone).toBe(first.body.client.phone)
+    expect(second.body.client.cif).toBe(first.body.client.cif)
+    expect(second.body.client.updatedAt).toBe(first.body.client.updatedAt)
   })
 })
 
